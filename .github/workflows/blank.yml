@@ -31,7 +31,17 @@ jobs:
       - name: Run a one-line script
         run: |
           echo Hello, world!
-          docker ps
+
+          docker buildx create \
+                --name buildkitd-arm \
+                --node buildkitd-arm \
+                --driver kubernetes \
+                --driver-opt replicas=2 \
+                --driver-opt loadbalance=random \
+                --driver-opt namespace=buildkit \
+                --use && \
+              # Build the Docker image using the Dockerfile
+              docker buildx build --platform linux/arm64 -t my-image:latest -f Dockerfile . --load
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
