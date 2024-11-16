@@ -26,8 +26,8 @@ jobs:
       - name: Create Docker Buildx builder
         run: |
           docker buildx create \
-            --name buildkitd-${{ matrix.architecture }} \
-            --node buildkitd-${{ matrix.architecture }} \
+            --name buildkitd-arm \
+            --node buildkitd-arm \
             --driver kubernetes \
             --driver-opt replicas=2 \
             --driver-opt loadbalance=random \
