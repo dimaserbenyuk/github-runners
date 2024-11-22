@@ -9,9 +9,6 @@ COPY . .
 # Initialize a Go module if not present
 RUN go mod init test || true
 
-# Download dependencies
-RUN go mod tidy
-
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
