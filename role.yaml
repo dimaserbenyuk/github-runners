@@ -41,7 +41,7 @@ metadata:
 rules:
 - apiGroups: ["rbac.authorization.k8s.io"]
   resources: ["roles", "rolebindings"]
-  verbs: ["create"]
+  verbs: ["create", "delete", "patch"]
 - apiGroups: [""]
   resources: ["secrets"]
   verbs: ["list", "get", "watch"]
