@@ -1,8 +1,10 @@
+#docker buildx
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  name: deployment-access
+  name: buildkit-deployment-manager
+  namespace: buildkit
 rules:
   - apiGroups: ["apps"]
     resources: ["deployments"]
@@ -13,16 +15,48 @@ rules:
   - apiGroups: [""]
     resources: ["pods/exec"]
     verbs: ["create"]
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: deployment-access-binding
+  name: buildkit-deployment-binding
+  namespace: buildkit
 subjects:
   - kind: ServiceAccount
-    name: kuber-gha-rs-no-permission
-    namespace: arc-systems
+    name: default
+    namespace: buildkit
 roleRef:
-  kind: ClusterRole
-  name: deployment-access
+  kind: Role
+  name: buildkit-deployment-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+#github controller runners
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: arc-systems
+  name: create-roles-permission
+rules:
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings"]
+  verbs: ["create"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list", "get", "watch"]
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: arc-systems
+  name: gha-runner-scale-set-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: gha-runner-scale-set-controller-gha-rs-controller
+  namespace: arc-systems
+roleRef:
+  kind: Role
+  name: create-roles-permission
   apiGroup: rbac.authorization.k8s.io

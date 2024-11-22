@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildkitd-config
+  namespace: buildkit
+data:
+  buildkitd.toml: |
+    root = "/var/lib/buildkit"
+    debug = false
+    [worker.oci]
+      max-parallelism = 32
+      gckeepstorage = "70%"
+      enabled = true
+      gc = true
+      gckeepstorage = 2000000
+      snapshotter = "overlayfs"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: buildkitd-arm
+  name: buildkitd-arm
+  namespace: buildkit
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  selector:
+    matchLabels:
+      app: buildkitd-arm
+  template:
+    metadata:
+      labels:
+        app: buildkitd-arm
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - k3s-worker1
+                      - k3s-worker2
+      containers:
+        - image: "moby/buildkit:v0.17.0-rootless"
+          imagePullPolicy: Always
+          name: buildkitd
+          args:
+            - --oci-worker-no-process-sandbox
+          readinessProbe:
+            exec:
+              command:
+                - buildctl
+                - debug
+                - workers
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: "500Mi"  # Maximum memory allowed
+              cpu: "300m"       # Maximum CPU allowed (200 milliCPU)
+            requests:
+              memory: "400Mi"  # Initial memory request
+              cpu: "200m"       # Initial CPU request
+          securityContext:
+            privileged: true  # Enables privileged mode
+          volumeMounts:
+            - name: config
+              # readOnly: true
+              mountPath: /etc/buildkit/buildkitd.toml
+              subPath: buildkitd.toml
+            # - name: var-lib-buildkit
+            #   mountPath: /var/lib/buildkit
+            - name: var-lib-buildkit
+              mountPath: /var/lib/buildkit
+      volumes:
+        - name: config
+          configMap:
+            name: buildkitd-config
+            items:
+              - key: buildkitd.toml
+                path: buildkitd.toml
+        - name: var-lib-buildkit
+          emptyDir: {}
+        # - name: var-lib-buildkit
+        #   persistentVolumeClaim:
+        #     claimName: openebs-pv-volume
+# kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: openebs-pv-volume
+# spec:
+#   storageClassName: openebs-hostpath
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 10Gi
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: openebs-pv-volume
+#   labels:
+#     type: local
+# spec:
+#   storageClassName: openebs-hostpath
+#   capacity:
+#     storage: 10Gi
+#   accessModes:
+#     - ReadWriteMany
+#   hostPath:
+#     path: "/data/openebs"
