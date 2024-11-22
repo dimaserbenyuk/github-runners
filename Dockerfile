@@ -3,11 +3,14 @@ FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
+# Install the correct Go toolchain
+RUN GOTOOLCHAIN=auto go install golang.org/dl/go1.23.3@latest && go1.23.3 download
+
 # Copy Go application source code
 COPY . .
 
-# Initialize a Go module if not present
-RUN go mod init test || true
+# # Ensure dependencies are up-to-date
+# RUN go mod tidy
 
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
