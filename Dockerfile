@@ -1,19 +1,23 @@
-# First stage: Install AWS CLI
-FROM alpine:latest AS builder
+# First stage: Build the Go application
+FROM golang:1.21-alpine AS builder
 
-# Install AWS CLI v1 in the builder stage
-RUN apk add --no-cache aws-cli
+# Set the working directory inside the container
+WORKDIR /app
 
-# Second stage: Final image with Nginx
-FROM nginx:alpine
+# Copy the Go application source code into the container
+COPY . .
 
-# Copy AWS CLI from builder stage
-COPY --from=builder /usr/bin/aws /usr/bin/aws
+# Build the Go application
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
-# Optional: Additional setup for the final stage
-# Add your specific configurations, files, or directories
-# Example:
-# COPY my-nginx-config.conf /etc/nginx/conf.d/default.conf
+# Second stage: Create a lightweight runtime image
+FROM alpine:latest
 
-# Expose the necessary ports
-EXPOSE 80
+# Set the working directory in the runtime container
+WORKDIR /root/
+
+# Copy the compiled binary from the builder stage
+COPY --from=builder /app/main .
+
+# Define the default command to run the application
+CMD ["./main"]
