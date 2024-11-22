@@ -1,5 +1,5 @@
 # First stage: Install AWS CLI
-FROM alpine:latest as builder
+FROM alpine:latest AS builder
 
 # Install AWS CLI v1 in the builder stage
 RUN apk add --no-cache aws-cli
