@@ -1,11 +1,16 @@
 # First stage: Build the Go application
 FROM golang:1.21-alpine AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Go application source code into the container
+# Copy Go application source code
 COPY . .
+
+# Initialize a Go module if not present
+RUN go mod init test || true
+
+# Download dependencies
+RUN go mod tidy
 
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux go build -o main .
@@ -13,7 +18,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 # Second stage: Create a lightweight runtime image
 FROM alpine:latest
 
-# Set the working directory in the runtime container
 WORKDIR /root/
 
 # Copy the compiled binary from the builder stage
