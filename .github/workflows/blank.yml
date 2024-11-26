@@ -19,7 +19,7 @@ jobs:
             --name buildkitd-arm \
             --node buildkitd-arm \
             --driver kubernetes \
-            --driver-opt replicas=3 \
+            --driver-opt replicas=2 \
             --driver-opt loadbalance=random \
             --driver-opt namespace=buildkit \
             --use
