@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Setup Docker Buildx
         run: |
           docker buildx create \
@@ -43,3 +49,24 @@ jobs:
         run: |
           docker buildx inspect --bootstrap --builder buildkitd-arm
           docker buildx du
+
+      # Step: Install Cosign
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
+
+      # Step: Sign the Image with Cosign
+      - name: Sign Docker Image with Cosign
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cosign sign --key ${{ secrets.COSIGN_KEY }} my-image:latest
+
+      # Step: Verify the Image Signature with Cosign
+      - name: Verify Docker Image Signature with Cosign
+        run: |
+          cosign verify my-image:latest
+
+      # Optional: Push the Signed Image
+      - name: Push Signed Image
+        run: |
+          docker push my-image:latest
