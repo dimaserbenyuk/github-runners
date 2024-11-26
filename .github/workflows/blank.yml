@@ -41,7 +41,7 @@ jobs:
             --platform linux/arm64 \
             --cache-from=type=s3,region=$AWS_REGION,bucket=buildkit-cache-minikube,mode=max \
             --cache-to=type=s3,region=$AWS_REGION,bucket=buildkit-cache-minikube,mode=max \
-            -t my-image:latest \
+            -t serbenyuk/nextjs:latest \
             -f Dockerfile . \
             --load
 
@@ -49,6 +49,11 @@ jobs:
         run: |
           docker buildx inspect --bootstrap --builder buildkitd-arm
           docker buildx du
+
+      # Optional: Push the Signed Image
+      - name: Push Signed Image
+        run: |
+          docker push serbenyuk/nextjs:latest
 
       # Step: Install Cosign
       - name: Install Cosign
@@ -59,14 +64,9 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key ${{ secrets.COSIGN_KEY }} my-image:latest
+          cosign sign --key ${{ secrets.COSIGN_KEY }} serbenyuk/nextjs:latest
 
       # Step: Verify the Image Signature with Cosign
       - name: Verify Docker Image Signature with Cosign
         run: |
-          cosign verify my-image:latest
-
-      # Optional: Push the Signed Image
-      - name: Push Signed Image
-        run: |
-          docker push my-image:latest
+          cosign verify --key ${{ secrets.COSIGN_PASSWORD }} serbenyuk/nextjs:latest
