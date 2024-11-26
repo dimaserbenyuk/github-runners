@@ -62,6 +62,9 @@ jobs:
       - name: Decode cosign key and save it
         run: echo "${{ secrets.COSIGN_KEY }}" > cosign.key
 
+      - name: Decode cosign key and save it
+        run: echo "${{ secrets.PUB }}" > cosign.pub
+
       # Step: Sign the Image with Cosign
       - name: Sign Docker Image with Cosign
         env:
@@ -72,4 +75,4 @@ jobs:
       # Step: Verify the Image Signature with Cosign
       - name: Verify Docker Image Signature with Cosign
         run: |
-          cosign verify --key --yes ${{ secrets.COSIGN_PASSWORD }} serbenyuk/nextjs:latest
+          cosign verify --key cosign.pub --yes serbenyuk/nextjs:latest
