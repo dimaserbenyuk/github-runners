@@ -67,9 +67,9 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key cosign.key serbenyuk/nextjs:latest
+          cosign sign --key cosign.key --no-prompt serbenyuk/nextjs:latest
 
       # Step: Verify the Image Signature with Cosign
       - name: Verify Docker Image Signature with Cosign
         run: |
-          cosign verify --key ${{ secrets.COSIGN_PASSWORD }} serbenyuk/nextjs:latest
+          cosign verify --key --no-prompt ${{ secrets.COSIGN_PASSWORD }} serbenyuk/nextjs:latest
