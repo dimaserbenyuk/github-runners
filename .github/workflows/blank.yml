@@ -59,12 +59,15 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.7.0
 
+      - name: Decode cosign key and save it
+        run: echo "${{ secrets.COSIGN_KEY }}" > cosign.key
+
       # Step: Sign the Image with Cosign
       - name: Sign Docker Image with Cosign
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key ${{ secrets.COSIGN_KEY }} serbenyuk/nextjs:latest
+          cosign sign --key cosign.key serbenyuk/nextjs:latest
 
       # Step: Verify the Image Signature with Cosign
       - name: Verify Docker Image Signature with Cosign
