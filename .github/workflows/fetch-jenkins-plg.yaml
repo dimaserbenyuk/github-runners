@@ -8,7 +8,7 @@ name: fetch-and-post-jenkins
 jobs:
   fetch-jenkins-updates:
     name: Fetch and Post Jenkins Updates
-    runs-on: kuber
+    runs-on: kuber-4bf9k-runner-49hx7 #kuber
 
     steps:
       - uses: actions/checkout@v4
@@ -20,9 +20,9 @@ jobs:
       - name: Fetch Jenkins Updates
         id: fetch-jenkins-updates
         env:
-          JENKINS_API: http://jenkins.jenkins.svc.cluster.local/updateCenter/api/json?depth=2&pretty=true&tree=sites%5Bupdates%5Bname,version,title%5D%5D
+          JENKINS_API: https://jenkins.example.com/updateCenter/api/json?depth=2&pretty=true&tree=sites%5Bupdates%5Bname,version,title%5D%5D
         run: |
-          response=$(curl -X POST -u ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} $JENKINS_API)
+          response=$(curl -k -X POST -u ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} $JENKINS_API)
           updates=$(echo "$response" | jq -r '.sites[].updates[] | {name: .name, version: .version} | @base64')
           echo "updates=$(echo $updates)" >> $GITHUB_OUTPUT
 
