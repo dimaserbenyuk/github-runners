@@ -20,7 +20,7 @@ jobs:
       - name: Fetch Jenkins Updates
         id: fetch-jenkins-updates
         env:
-          JENKINS_API: https://jenkins.example.com/updateCenter/api/json?depth=2&pretty=true&tree=sites%5Bupdates%5Bname,version,title%5D%5D
+          JENKINS_API: http://jenkins.jenkins.svc.cluster.local:8080/updateCenter/api/json?depth=2&pretty=true&tree=sites%5Bupdates%5Bname,version,title%5D%5D
         run: |
           response=$(curl -k -X POST -u ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} $JENKINS_API)
           updates=$(echo "$response" | jq -r '.sites[].updates[] | {name: .name, version: .version} | @base64')
