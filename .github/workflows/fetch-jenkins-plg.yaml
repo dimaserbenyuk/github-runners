@@ -5,6 +5,11 @@ name: fetch-and-post-jenkins
     - cron: 0 13 * * 1
   workflow_dispatch:
 
+permissions:
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
 jobs:
   fetch-jenkins-updates:
     name: Fetch and Post Jenkins Updates
