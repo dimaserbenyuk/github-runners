@@ -16,6 +16,10 @@ jobs:
       - name: Install jq
         uses: dcarbone/install-jq-action@v3.0.1
 
+      - name: Install YQ
+        uses: dcarbone/install-yq-action@v1.3.1
+            
+
       - name: Set Branch Name
         run: |
           echo "NEW_BRANCH_NAME=auto-update-jenkins-cd-plugins-$(date +%Y-%m-%d)-${GITHUB_REF_NAME}" >> $GITHUB_ENV
