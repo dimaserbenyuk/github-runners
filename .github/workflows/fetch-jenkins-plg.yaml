@@ -13,6 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v3.0.1
+
       - name: Set Branch Name
         run: |
           echo "NEW_BRANCH_NAME=auto-update-jenkins-cd-plugins-$(date +%Y-%m-%d)-${GITHUB_REF_NAME}" >> $GITHUB_ENV
@@ -26,7 +29,7 @@ jobs:
           updates=$(echo "$response" | jq -r '.sites[].updates[] | {name: .name, version: .version} | @base64')
           echo "updates=$(echo $updates)" >> $GITHUB_OUTPUT
 
-          echo $response
+          echo $response | jq .
 
       # - name: Update plugins.yaml
       #   id: update-plugins
