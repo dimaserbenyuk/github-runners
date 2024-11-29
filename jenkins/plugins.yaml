@@ -4,3 +4,4 @@ controller:
     - workflow-aggregator:600.vb_57cdd26fdd7
     - git:5.6.0
     - configuration-as-code:1897.v79281e066ea_7
+    - sse-gateway:1.23
