@@ -26,6 +26,8 @@ jobs:
           updates=$(echo "$response" | jq -r '.sites[].updates[] | {name: .name, version: .version} | @base64')
           echo "updates=$(echo $updates)" >> $GITHUB_OUTPUT
 
+          echo $response
+
       # - name: Update plugins.yaml
       #   id: update-plugins
       #   env:
