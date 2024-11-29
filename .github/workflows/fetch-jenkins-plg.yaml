@@ -83,7 +83,7 @@ jobs:
         if: env.UPDATE_COUNT > 0
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.PAT }}
           author: actions[bot] <915556+lf-actions[bot]@users.noreply.github.com>
           committer: actions[bot] <915556+lf-actions[bot]@users.noreply.github.com>
           commit-message: Update Jenkins plugins in jenkins
