@@ -8,7 +8,7 @@ name: fetch-and-post-jenkins
 jobs:
   fetch-jenkins-updates:
     name: Fetch and Post Jenkins Updates
-    runs-on: kuber-4bf9k-runner-49hx7 #kuber
+    runs-on: kuber
 
     steps:
       - uses: actions/checkout@v4
