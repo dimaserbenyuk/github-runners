@@ -5,3 +5,4 @@ controller:
     - git:5.6.0
     - configuration-as-code:1897.v79281e066ea_7
     - sse-gateway:1.27
+    - ssh-slaves:2.973.v0fa_8c0dea_f9f
