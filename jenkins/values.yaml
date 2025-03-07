@@ -39,7 +39,7 @@ controller:
     repository: "jenkins/jenkins"
 
     # -- Controller image tag override; i.e., tag: "2.440.1-jdk17"
-    tag:
+    tag: "2.492.2"
 
     # -- Controller image tag label
     tagLabel: jdk17
@@ -186,10 +186,10 @@ controller:
   # Set runAsUser to 1000 to let Jenkins run as non-root user 'jenkins', which exists in 'jenkins/jenkins' docker image.
   # When configuring runAsUser to a different value than 0 also set fsGroup to the same value:
   # -- Deprecated in favor of `controller.podSecurityContextOverride`. uid that jenkins runs with.
-  runAsUser: 1000
+  runAsUser: 0
 
   # -- Deprecated in favor of `controller.podSecurityContextOverride`. uid that will be used for persistent volume.
-  fsGroup: 1000
+  fsGroup: 0
 
   # If you have PodSecurityPolicies that require dropping of capabilities as suggested by CIS K8s benchmark, put them here
   # securityContextCapabilities:
@@ -209,9 +209,9 @@ controller:
 
   # -- Allow controlling the securityContext for the jenkins container
   containerSecurityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    readOnlyRootFilesystem: true
+    runAsUser: 0
+    runAsGroup: 0
+    readOnlyRootFilesystem: false
     allowPrivilegeEscalation: false
 
   # For minikube, set this to NodePort, elsewhere uses LoadBalancer
@@ -231,6 +231,10 @@ controller:
   # Use Local to preserve the client source IP and avoids a second hop for LoadBalancer and NodePort type services,
   # but risks potentially imbalanced traffic spreading.
   serviceExternalTrafficPolicy:
+
+  # If enabled, the controller is available through its service before its pods reports ready. Makes startup screen and
+  # auto-reload on restart feature possible.
+  publishNotReadyAddresses:
 
   # -- Jenkins controller service annotations
   serviceAnnotations: {}
@@ -399,10 +403,10 @@ controller:
   # Plugins will be installed during Jenkins controller start
   # -- List of Jenkins plugins to install. If you don't want to install plugins, set it to `false`
   installPlugins:
-    - kubernetes:4296.v20a_7e4d77cf6
+    - kubernetes:4314.v5b_846cf499eb_
     - workflow-aggregator:600.vb_57cdd26fdd7
-    - git:5.6.0
-    - configuration-as-code:1897.v79281e066ea_7
+    - git:5.7.0
+    - configuration-as-code:1932.v75cb_b_f1b_698d
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -564,7 +568,7 @@ controller:
         # -- Repository of the image that triggers the reload
         repository: kiwigrid/k8s-sidecar
         # -- Tag for the image that triggers the reload
-        tag: 1.28.0
+        tag: 1.30.1
       imagePullPolicy: IfNotPresent
       resources: {}
         #   limits:
@@ -684,24 +688,15 @@ controller:
 
   ingress:
     # -- Enables ingress
-    enabled: true
+    enabled: false
 
     # Override for the default paths that map requests to the backend
     # -- Override for the default Ingress paths
-    paths:
-    - path: /
-      pathType: ImplementationSpecific  # Required in v1 Ingress API
-      backend:
-        service:
-          name: jenkins                 # Name of your Jenkins service
-          port:
-            number: 8080
-    # paths: 
-    # # - backend:
-    # #     serviceName: jenkins
-    # #     servicePort: 8080
+    paths: []
     # - backend:
-    #     pathType: ImplementationSpecific
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+    # - backend:
     #     serviceName: >-
     #       {{ template "jenkins.fullname" . }}
     #     # Don't use string here, use only integer value!
@@ -714,9 +709,8 @@ controller:
     # -- Ingress labels
     labels: {}
     # -- Ingress annotations
-    annotations: 
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: "ca-issuer"
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
@@ -724,19 +718,18 @@ controller:
 
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
     # -- Ingress path
-    # path: /
-    
+    path:
 
     # configures the hostname e.g. jenkins.example.com
     # -- Ingress hostname
-    hostName: jenkins.example.com
+    hostName:
     # -- Hostname to serve assets from
     resourceRootUrl:
     # -- Ingress TLS configuration
-    tls: 
-    - secretName: jenkins-example.com
-      hosts:
-        - jenkins.example.com
+    tls: []
+    # - secretName: jenkins.cluster.local
+    #   hosts:
+    #     - jenkins.cluster.local
 
   # often you want to have your controller all locked down and private,
   # but you still want to get webhooks from your SCM
@@ -962,7 +955,7 @@ agent:
     # -- Repository to pull the agent jnlp image from
     repository: "jenkins/inbound-agent"
     # -- Tag of the image to pull
-    tag: "3273.v4cfe589b_fd83-1"
+    tag: "3283.v92c105e0f819-9"
   # -- Configure working directory for default agent
   workingDir: "/home/jenkins/agent"
   nodeUsageMode: "NORMAL"
@@ -1336,6 +1329,8 @@ serviceAccount:
   extraLabels: {}
   # -- Controller ServiceAccount image pull secret
   imagePullSecretName:
+  # -- Auto-mount ServiceAccount token
+  automountServiceAccountToken: true
 
 
 serviceAccountAgent:
@@ -1351,6 +1346,8 @@ serviceAccountAgent:
   extraLabels: {}
   # -- Agent ServiceAccount image pull secret
   imagePullSecretName:
+  # -- Auto-mount ServiceAccount token
+  automountServiceAccountToken: true
 
 # -- Checks if any deprecated values are used
 checkDeprecation: true
@@ -1373,4 +1370,4 @@ helmtest:
       # -- Repository of the image used to test the framework
       repository: "bats/bats"
       # -- Tag of the image to test the framework
-      tag: "1.11.0"
+      tag: "1.11.1"
