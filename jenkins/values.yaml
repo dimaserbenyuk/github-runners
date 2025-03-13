@@ -659,6 +659,8 @@ controller:
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#taints-and-tolerations-beta-feature
   # -- Toleration labels for pod assignment
   tolerations: []
+    # - key: "CriticalAddonsOnly"
+    #   operator: "Exists"
   # -- Set TerminationGracePeriodSeconds
   terminationGracePeriodSeconds:
   # -- Set the termination message path
@@ -1246,7 +1248,7 @@ persistence:
   # Requires persistence.enabled: true
   # If defined, PVC must be created manually before volume will be bound
   # -- Provide the name of a PVC
-  existingClaim:
+  existingClaim: "jenkins"
 
   # jenkins data Persistent Volume Storage Class
   # If defined, storageClassName: <storageClass>
@@ -1254,7 +1256,7 @@ persistence:
   # If undefined (the default) or set to null, no storageClassName spec is
   #   set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS & OpenStack)
   # -- Storage class for the PVC
-  storageClass:
+  storageClass: "ebs-sc"
   # -- Annotations for the PVC
   annotations: {}
   # -- Labels for the PVC

@@ -1,0 +1,13 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: jenkins
+spec:
+  storageClassName: ebs-sc
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteOnce
+  awsElasticBlockStore:
+    volumeID: aws://us-east-1c/vol-008504e9a8e5e3e50
+    fsType: ext4
