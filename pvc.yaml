@@ -4,10 +4,10 @@ metadata:
   name: jenkins
   namespace: jenkins
 spec:
-  storageClassName: ebs-sc
+  storageClassName: gp3-us-west-1a
   volumeName: "jenkins"
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 8Gi
+      storage: 300Gi
