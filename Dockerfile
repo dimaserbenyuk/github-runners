@@ -47,3 +47,15 @@ EXPOSE 8080
 
 # Define the command to run the application when the container starts
 CMD ["./main"]
+# ARG  AMAZON_LINUX_VERSION="2023"
+# FROM amazonlinux:${AMAZON_LINUX_VERSION}
+
+# ENV DOCKER_VERSION='26*'
+
+
+# RUN dnf install -y --allowerasing coreutils curl && \
+#     ### install docker
+#     dnf install -y --setopt=install_weak_deps=False docker-${DOCKER_VERSION}
+
+
+# CMD ["/bin/sleep", "36000"]
